@@ -1,8 +1,7 @@
 package main
 
-import "fmt"
-
 func main() {
+	server := newAPIServer(":8080")
 
-	fmt.Println("Initial KV Store API")
+	server.Run()
 }

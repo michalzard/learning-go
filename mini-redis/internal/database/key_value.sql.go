@@ -28,3 +28,14 @@ func (q *Queries) CreateKeyValue(ctx context.Context, arg CreateKeyValueParams) 
 	err := row.Scan(&i.K, &i.V, &i.CreatedAt)
 	return i, err
 }
+
+const getValueByKey = `-- name: GetValueByKey :one
+SELECT v FROM kv WHERE k = $1
+`
+
+func (q *Queries) GetValueByKey(ctx context.Context, k string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getValueByKey, k)
+	var v string
+	err := row.Scan(&v)
+	return v, err
+}

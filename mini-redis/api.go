@@ -27,9 +27,9 @@ func (api *APIServer) Run(queries *database.Queries) {
 	})
 	apiConfig := APIConfig{DB: queries}
 
-	router.HandleFunc("POST /key", func(w http.ResponseWriter, r *http.Request) {
-		apiConfig.CreateKV(w, r)
-	})
+	// configured controllers here v
+	router.HandleFunc("POST /key", apiConfig.CreateKV)
+	router.HandleFunc("GET /key", apiConfig.getValueByKey)
 
 	fmt.Printf("API listening to %v\n", api.address)
 	log.Fatal(http.ListenAndServe(api.address, router))
@@ -77,4 +77,54 @@ func (cfg *APIConfig) CreateKV(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
+}
+
+func (cfg APIConfig) getValueByKey(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+
+	type Parameters struct {
+		Key     string `json:"key"`
+		Message string `json:"message"`
+	}
+	params := Parameters{
+		Message: "Found key",
+	}
+	err := decoder.Decode(&params)
+
+	if err != nil {
+		http.Error(w, "Issue decoding body", http.StatusInternalServerError)
+	}
+
+	v, err := cfg.DB.GetValueByKey(r.Context(), params.Key)
+
+	if err != nil {
+		http.Error(w, "KV pair not found", http.StatusNotFound)
+		return
+	}
+	data, err := json.Marshal(v)
+
+	if err != nil {
+		http.Error(w, "Issue marshalling value from db", http.StatusInternalServerError)
+		return
+	}
+
+	type JSONResponse struct {
+		Message string          `json:"message"`
+		Value   json.RawMessage `json:"value"`
+	}
+
+	jsonrp := JSONResponse{
+		Message: "Found matching value key pair",
+		Value:   data,
+	}
+
+	formattedData, err := json.Marshal(jsonrp)
+	if err != nil {
+		http.Error(w, "Issue formatting response", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write(formattedData)
 }

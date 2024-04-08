@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -27,6 +28,14 @@ func (q *Queries) CreateKeyValue(ctx context.Context, arg CreateKeyValueParams) 
 	var i Kv
 	err := row.Scan(&i.K, &i.V, &i.CreatedAt)
 	return i, err
+}
+
+const delKV = `-- name: DelKV :execresult
+DELETE FROM kv WHERE k = $1
+`
+
+func (q *Queries) DelKV(ctx context.Context, k string) (sql.Result, error) {
+	return q.db.ExecContext(ctx, delKV, k)
 }
 
 const getValueByKey = `-- name: GetValueByKey :one

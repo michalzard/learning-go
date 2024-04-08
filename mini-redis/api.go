@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/michalzard/learning-go/mini-redis/internal/database"
@@ -30,6 +31,7 @@ func (api *APIServer) Run(queries *database.Queries) {
 	// configured controllers here v
 	router.HandleFunc("POST /key", apiConfig.CreateKV)
 	router.HandleFunc("GET /key", apiConfig.getValueByKey)
+	router.HandleFunc("DELETE /key", apiConfig.deletePairByKey)
 
 	fmt.Printf("API listening to %v\n", api.address)
 	log.Fatal(http.ListenAndServe(api.address, router))
@@ -125,6 +127,28 @@ func (cfg APIConfig) getValueByKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Write(formattedData)
+}
+
+func (cfg APIConfig) deletePairByKey(w http.ResponseWriter, r *http.Request) {
+
+	type Parameters struct {
+		Key string `json:"key"`
+	}
+
+	params := Parameters{}
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&params)
+
+	result, err := cfg.DB.DelKV(r.Context(), params.Key)
+	affected, _ := result.RowsAffected()
+	if err != nil {
+		http.Error(w, "Error deleting record from db", http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Deleted , Affected: " + strconv.FormatInt(affected, 10)))
+
 }

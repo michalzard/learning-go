@@ -5,3 +5,6 @@ RETURNING *;
 
 -- name: GetValueByKey :one
 SELECT v FROM kv WHERE k = $1;
+
+-- name: DelKV :execresult
+DELETE FROM kv WHERE k = $1;

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"slices"
 
@@ -12,6 +13,8 @@ type BaseScene interface {
 	Update()
 	Render(screen *ebiten.Image)
 }
+
+// TODO: TURN gos into map that maps gameobject to its own id so we can do quick lookups if needed
 type SceneLayer struct {
 	name string
 	gos  []GameObject
@@ -30,6 +33,7 @@ func (sl *SceneLayer) RemoveFromLayer(gameObj GameObject) {
 }
 
 type Scene struct {
+	BaseScene
 	name   string
 	layers []SceneLayer
 }
@@ -59,8 +63,22 @@ func (s *Scene) Render(screen *ebiten.Image) {
 func (s *Scene) AddToLayer(layerName string, gameObj GameObject) {
 	for _, layer := range s.layers {
 		if layer.name == layerName {
+			fmt.Println(layer.name, gameObj)
+			fmt.Println(layer)
+
 			layer.gos = append(layer.gos, gameObj)
+
+			fmt.Println(layer)
+
+			break
 		}
+	}
+}
+
+func NewScene(name string) *Scene {
+	return &Scene{
+		name:   name,
+		layers: []SceneLayer{{name: "Foreground"}, {name: "Background"}, {name: "Overlay"}},
 	}
 }
 
@@ -90,4 +108,25 @@ func (sm *SceneManager) Render(screen *ebiten.Image) {
 func (sm *SceneManager) Switch(scene Scene) {
 	sm.current = scene
 	sm.current.Init()
+}
+
+func (sm *SceneManager) GetScene(sceneName string) *Scene {
+	var selectedScene *Scene
+
+	for _, scene := range sm.scenes {
+		if scene.name == sceneName {
+			selectedScene = &scene
+			break
+		}
+	}
+	if selectedScene == nil {
+		return nil
+	}
+
+	return selectedScene
+}
+func (sm *SceneManager) AddScenes(scene ...Scene) {
+	if len(scene) > 0 {
+		sm.scenes = append(sm.scenes, scene...)
+	}
 }

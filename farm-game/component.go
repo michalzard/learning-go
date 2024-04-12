@@ -13,6 +13,7 @@ type BaseComponent interface {
 	Render(screen *ebiten.Image)
 	SetParent(parent *GameObject)
 }
+
 type Component struct {
 	parent *GameObject
 }
@@ -24,21 +25,22 @@ func (c *Component) SetParent(parent *GameObject) {
 type ImageComponent struct {
 	Component
 	img    *ebiten.Image
-	imgSrc string
+	src    string
 	offset Transform
 }
 
-func (ic *ImageComponent) SetParent(parent *GameObject) {
-	ic.parent = parent
-}
 func (ic *ImageComponent) Init() {
-	img, _, err := ebitenutil.NewImageFromFile(ic.imgSrc)
+	img, _, err := ebitenutil.NewImageFromFile(ic.src)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ic.img = img
-
 }
+
+func (ic *ImageComponent) Update() {
+	// Implement update logic here if needed
+}
+
 func (ic *ImageComponent) Render(screen *ebiten.Image) {
 	if ic.parent != nil {
 		options := &ebiten.DrawImageOptions{}

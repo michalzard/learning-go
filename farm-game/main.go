@@ -11,7 +11,6 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-
 	return nil
 }
 
@@ -24,9 +23,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-
-	sm := SceneManager{}
-	sm.Init(gameScenes...)
 
 	ebiten.SetFullscreen(true)
 	ebiten.SetWindowTitle("Farm Game")

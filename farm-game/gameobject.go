@@ -60,6 +60,12 @@ func (gameObj *GameObject) addComponents(c ...BaseComponent) {
 	for _, component := range c {
 		component.SetParent(gameObj)
 		gameObj.components = append(gameObj.components, component)
-
 	}
+}
+
+//
+func NewPlayer(spawn Transform) *GameObject {
+	player := GameObject{name: "Player", transform: spawn}
+	player.addComponent(&ImageComponent{src: "sprites/woodcutter/Woodcutter.png"})
+	return &player
 }

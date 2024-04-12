@@ -12,14 +12,21 @@ type Transform struct {
 	rotation float64
 }
 
+var globalId uint = 0
+
 type GameObject struct {
+	id         uint
+	active     bool
 	parent     *GameObject
 	name       string
 	transform  Transform
-	components []Component
+	components []BaseComponent
 }
 
-func (gameObj GameObject) Init() {
+func (gameObj *GameObject) Init() {
+	globalId++
+	gameObj.id = globalId
+	gameObj.active = true
 	gameObj.InitComponents()
 }
 func (gameObj GameObject) Update() {
@@ -45,11 +52,11 @@ func (gameObj GameObject) RenderComponents(screen *ebiten.Image) {
 	}
 }
 
-func (gameObj *GameObject) addComponent(c Component) {
+func (gameObj *GameObject) addComponent(c BaseComponent) {
 	c.SetParent(gameObj)
 	gameObj.components = append(gameObj.components, c)
 }
-func (gameObj *GameObject) addComponents(c ...Component) {
+func (gameObj *GameObject) addComponents(c ...BaseComponent) {
 	for _, component := range c {
 		component.SetParent(gameObj)
 		gameObj.components = append(gameObj.components, component)

@@ -7,23 +7,22 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-type Component interface {
+type BaseComponent interface {
 	Init()
 	Update()
 	Render(screen *ebiten.Image)
 	SetParent(parent *GameObject)
 }
-type BaseComponent struct {
+type Component struct {
 	parent *GameObject
 }
 
-func (c *BaseComponent) SetParent(parent *GameObject) {
+func (c *Component) SetParent(parent *GameObject) {
 	c.parent = parent
 }
 
 type ImageComponent struct {
 	Component
-	parent *GameObject
 	img    *ebiten.Image
 	imgSrc string
 	offset Transform
@@ -41,7 +40,6 @@ func (ic *ImageComponent) Init() {
 
 }
 func (ic *ImageComponent) Render(screen *ebiten.Image) {
-
 	if ic.parent != nil {
 		options := &ebiten.DrawImageOptions{}
 		options.GeoM.Translate(ic.parent.transform.position.x, ic.parent.transform.position.y)
@@ -52,5 +50,4 @@ func (ic *ImageComponent) Render(screen *ebiten.Image) {
 	} else {
 		log.Fatal("ImageComponent needs to have parent specified to render")
 	}
-
 }

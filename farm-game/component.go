@@ -112,3 +112,19 @@ func (ic InputComponent) Update() {
 	}
 }
 func (ic InputComponent) Render(screen *ebiten.Image) {}
+
+type AnimationFrame struct {
+	frame      Vector2
+	frameCount uint
+	size       Vector2
+}
+
+type Animation struct {
+	sprites []ImageComponent
+	current uint
+	frames  []AnimationFrame
+}
+
+func (a *Animation) Animate() {
+	// Implement spritesheet looping for animation
+}

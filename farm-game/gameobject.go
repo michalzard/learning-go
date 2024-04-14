@@ -54,7 +54,7 @@ func (gameObj GameObject) RenderComponents(screen *ebiten.Image) {
 	}
 }
 
-func (gameObj *GameObject) addComponent(c BaseComponent) {
+func (gameObj *GameObject) AddComponent(c BaseComponent) {
 	c.SetParent(gameObj)
 	gameObj.components = append(gameObj.components, c)
 }

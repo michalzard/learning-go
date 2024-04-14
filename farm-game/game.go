@@ -1,17 +1,14 @@
 package main
 
-import "fmt"
-
 func init() {
-	sm := SceneManager{}
-	sm.AddScenes(*NewScene("Farmland"))
-
-	farmland := sm.GetScene("Farmland")
+	farmland := NewScene("Farmland")
 
 	if farmland != nil {
-		player := NewPlayer(Transform{position: Vector2{200, 200}})
-		farmland.AddToLayer("Foreground", *player)
-		fmt.Printf("%v", farmland.layers)
-
+		player := NewPlayer(Vector2{0, 0})
+		farmland.AddToLayer("Foreground", player)
 	}
+
+	// load into manager
+	sm.Init(*farmland)
+
 }

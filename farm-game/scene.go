@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -14,22 +12,22 @@ type BaseScene interface {
 	Render(screen *ebiten.Image)
 }
 
-// TODO: TURN gos into map that maps gameobject to its own id so we can do quick lookups if needed
 type SceneLayer struct {
 	name string
-	gos  []GameObject
+	gos  map[uint]*GameObject
 }
 
-func (sl *SceneLayer) AddToLayer(gameObj GameObject) {
-	sl.gos = append(sl.gos, gameObj)
+func NewSceneLayer(layerName string) SceneLayer {
+	return SceneLayer{
+		name: layerName,
+		gos:  make(map[uint]*GameObject),
+	}
+}
+func (sl *SceneLayer) AddToLayer(gameObj *GameObject) {
+	sl.gos[gameObj.id] = gameObj
 }
 func (sl *SceneLayer) RemoveFromLayer(gameObj GameObject) {
-	for i, layerObj := range sl.gos {
-		if layerObj.id == gameObj.id {
-			sl.gos = slices.Delete(sl.gos, i, 1)
-			return
-		}
-	}
+	delete(sl.gos, gameObj.id)
 }
 
 type Scene struct {
@@ -60,16 +58,10 @@ func (s *Scene) Render(screen *ebiten.Image) {
 	}
 }
 
-func (s *Scene) AddToLayer(layerName string, gameObj GameObject) {
+func (s *Scene) AddToLayer(layerName string, gameObj *GameObject) {
 	for _, layer := range s.layers {
 		if layer.name == layerName {
-			fmt.Println(layer.name, gameObj)
-			fmt.Println(layer)
-
-			layer.gos = append(layer.gos, gameObj)
-
-			fmt.Println(layer)
-
+			layer.AddToLayer(gameObj)
 			break
 		}
 	}
@@ -78,7 +70,7 @@ func (s *Scene) AddToLayer(layerName string, gameObj GameObject) {
 func NewScene(name string) *Scene {
 	return &Scene{
 		name:   name,
-		layers: []SceneLayer{{name: "Foreground"}, {name: "Background"}, {name: "Overlay"}},
+		layers: []SceneLayer{NewSceneLayer("Foreground"), NewSceneLayer("Background"), NewSceneLayer("Overlay")},
 	}
 }
 
@@ -124,9 +116,4 @@ func (sm *SceneManager) GetScene(sceneName string) *Scene {
 	}
 
 	return selectedScene
-}
-func (sm *SceneManager) AddScenes(scene ...Scene) {
-	if len(scene) > 0 {
-		sm.scenes = append(sm.scenes, scene...)
-	}
 }

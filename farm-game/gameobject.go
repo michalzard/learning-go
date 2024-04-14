@@ -58,3 +58,7 @@ func (gameObj *GameObject) AddComponent(c BaseComponent) {
 	c.SetParent(gameObj)
 	gameObj.components = append(gameObj.components, c)
 }
+
+func (gameObj *GameObject) setParent(parent *GameObject) {
+	gameObj.parent = parent
+}

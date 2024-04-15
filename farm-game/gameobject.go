@@ -10,6 +10,7 @@ type Vector2 struct {
 
 type Transform struct {
 	position Vector2
+	size     Vector2
 	scale    Vector2
 	rotation float64
 }

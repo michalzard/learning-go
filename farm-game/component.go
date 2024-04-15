@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image"
 	"log"
 	"math"
 
@@ -23,11 +24,16 @@ func (c *Component) SetParent(parent *GameObject) {
 	c.parent = parent
 }
 
+type ImageDestination struct {
+	x    int
+	y    int
+	size Vector2
+}
 type ImageComponent struct {
 	Component
 	img *ebiten.Image
 	src string
-	// offset Transform
+	d   ImageDestination
 }
 
 func (ic *ImageComponent) Init() {
@@ -50,7 +56,8 @@ func (ic *ImageComponent) Render(screen *ebiten.Image) {
 		options.GeoM.Scale(ic.parent.transform.scale.x, ic.parent.transform.scale.y)
 		options.GeoM.Rotate(ic.parent.transform.rotation)
 		if ic.img != nil {
-			screen.DrawImage(ic.img, options)
+			destRect := image.Rect(ic.d.x, ic.d.y, ic.d.x+int(ic.d.size.x), ic.d.y+int(ic.d.size.y))
+			screen.DrawImage(ic.img.SubImage(destRect).(*ebiten.Image), options)
 		} else {
 			log.Fatal("ImageComponent needs to have img pointer")
 		}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"image/color"
 	"log"
 
@@ -12,30 +11,41 @@ import (
 )
 
 type Text struct {
-	options text.DrawOptions
-	content string
+	options    text.DrawOptions
+	content    string
+	transform  Transform
+	color      color.Color
+	fontSize   float64
+	fontFamily *text.GoTextFaceSource
 }
 
-// TODO: implement proper simple text rendering
 func (t *Text) Render(screen *ebiten.Image) {
 	// Draw info
-	msg := fmt.Sprintf("TPS: %0.2f", ebiten.ActualTPS())
-	op := &text.DrawOptions{}
-	op.GeoM.Translate(0, 20)
-	op.ColorScale.ScaleWithColor(color.White)
+	t.options.GeoM.Translate(t.transform.position.x, t.transform.position.y)
+	if t.color != nil {
+		t.options.ColorScale.ScaleWithColor(t.color)
+	} else {
+		t.options.ColorScale.ScaleWithColor(color.White)
+	}
 
 	// Example
-	fontFamily, err := text.NewGoTextFaceSource(bytes.NewBuffer(fonts.MPlus1pRegular_ttf))
+	if t.fontFamily == nil {
+		fontFamily, err := text.NewGoTextFaceSource(bytes.NewBuffer(fonts.MPlus1pRegular_ttf))
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		t.fontFamily = fontFamily
+	}
 
-	if err != nil {
-		log.Fatal("Unable to load fontface", err)
-		return
+	if t.fontSize == 0.0 {
+		t.fontSize = 16.0
 	}
 
 	font := text.GoTextFace{
-		Source: fontFamily,
-		Size:   20,
+		Source: t.fontFamily,
+		Size:   t.fontSize,
 	}
 
-	text.Draw(screen, msg, &font, op)
+	text.Draw(screen, t.content, &font, &t.options)
 }

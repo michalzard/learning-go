@@ -121,17 +121,68 @@ func (ic InputComponent) Update() {
 func (ic InputComponent) Render(screen *ebiten.Image) {}
 
 type AnimationFrame struct {
-	frame      Vector2
-	frameCount uint
-	size       Vector2
+	image ImageComponent
 }
 
 type Animation struct {
-	sprites []ImageComponent
-	current uint
-	frames  []AnimationFrame
+	name         string
+	frames       []AnimationFrame
+	currentFrame AnimationFrame
 }
 
-func (a *Animation) Animate() {
-	// Implement spritesheet looping for animation
+func (a *Animation) Render(screen *ebiten.Image) {
+	a.currentFrame.image.Render(screen)
 }
+
+type AnimatorComponent struct {
+	Component
+	current    *Animation
+	animations []Animation
+}
+
+func (ac *AnimatorComponent) setParent(parent *GameObject) {
+	ac.parent = parent
+}
+
+func (ac *AnimatorComponent) Init() {}
+func (ac *AnimatorComponent) Update() {
+
+}
+func (ac *AnimatorComponent) Render(screen *ebiten.Image) {
+	if ac.current != nil {
+		ac.current.Render(screen)
+	}
+}
+func (ac *AnimatorComponent) GetAnimation(animationName string) *Animation {
+	for _, anim := range ac.animations {
+		if anim.name == animationName {
+			return &anim
+		}
+	}
+	return nil
+}
+
+func (ac *AnimatorComponent) SetAnimation(animationName string) {
+	animation := ac.GetAnimation(animationName)
+
+	if animation != nil {
+		ac.current = animation
+	}
+}
+
+/*
+	Animator Component
+
+	- render method should render currentAnimation
+	- update method should loop trough all the available frames
+	- sequence of frames slice should be based on state -> "running" , "idle" , "attacking", etc...
+	-
+*/
+
+/*
+	Animation
+
+	- primitive that holds name so that animator can get its reference based on name
+	- should hold ref to image
+	- method to loop over image with subImage to have precise cutout frame
+*/

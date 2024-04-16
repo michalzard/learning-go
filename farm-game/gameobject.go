@@ -1,6 +1,8 @@
 package main
 
 import (
+	"reflect"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -24,6 +26,10 @@ type GameObject struct {
 	name       string
 	transform  Transform
 	components []BaseComponent
+}
+
+func (gameObj *GameObject) setParent(parent *GameObject) {
+	gameObj.parent = parent
 }
 
 func (gameObj *GameObject) Init() {
@@ -60,6 +66,12 @@ func (gameObj *GameObject) AddComponent(c BaseComponent) {
 	gameObj.components = append(gameObj.components, c)
 }
 
-func (gameObj *GameObject) setParent(parent *GameObject) {
-	gameObj.parent = parent
+func (gameObj *GameObject) GetComponent(c BaseComponent) BaseComponent {
+	for _, comp := range gameObj.components {
+
+		if reflect.TypeOf(comp) == reflect.TypeOf(c) {
+			return comp
+		}
+	}
+	return nil
 }

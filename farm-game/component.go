@@ -140,7 +140,7 @@ type AnimatorComponent struct {
 	animations []Animation
 }
 
-func (ac *AnimatorComponent) setParent(parent *GameObject) {
+func (ac *AnimatorComponent) SetParent(parent *GameObject) {
 	ac.parent = parent
 }
 

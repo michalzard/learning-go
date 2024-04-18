@@ -13,13 +13,13 @@ type Game struct {
 
 func (g *Game) Update() error {
 	sm.Update()
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Clear()
 	sm.Render(screen)
-
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -28,7 +28,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	ebiten.SetFullscreen(true)
-	ebiten.SetWindowTitle("Farm Game")
+	ebiten.SetWindowTitle("Harvest Homestead")
 
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
